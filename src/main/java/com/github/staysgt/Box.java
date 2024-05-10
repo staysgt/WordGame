@@ -10,6 +10,8 @@ public class Box {
     int y;
     char letter = 0;
 
+    Box box;
+
     public Box() {
 
     }
