@@ -8,7 +8,7 @@ public class Box {
 
     int x;
     int y;
-    char letter = 0;
+    char letter = '_';
 
     Box box;
 
@@ -67,7 +67,6 @@ public class Box {
     public void setLetter(char letter) {
         this.letter = letter;
     }
-
     public char getLetter() {
         return letter;
     }
