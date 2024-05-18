@@ -4,17 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Grid {
     ArrayList<ArrayList<Box>> boxList = new ArrayList<>();
     ArrayList<String> stringList = new ArrayList<>();
 
-    int wordsRemoved = 0;
-    int score = (wordsRemoved * 1000);
-    Character c;
 
+    int wordsRemoved = 0;
     boolean boxFull = false;
 
     BufferedReader allWords = new BufferedReader(new FileReader("src/main/java/com/github/staysgt/wordlist.txt"));
@@ -22,10 +19,11 @@ public class Grid {
 
     boolean wordsDeleted = false;
 
+    Box mostRecent;
+
     public Grid() throws FileNotFoundException {
     }
 
-    Box mostRecent;
 
     /**
      * turns the list of all words into an array
@@ -35,7 +33,7 @@ public class Grid {
         String line;
         int i = 0;
         while((line = allWords.readLine()) != null) {
-            if(line.length() > 1) {
+            if(line.length() > 2) {
                 arrayOfWords.add(i, line);
                 i++;
             }
@@ -44,24 +42,21 @@ public class Grid {
     }
 
 
+
+
     /**
      * finds the potential words based on the most recent addition to the grid
-     * @return the potential words from the most recent addition to the grid
      */
     public void potentialWords() {
         boxList = new ArrayList<>();
         stringList = new ArrayList<>();
-        // issue when right most
-        StringBuilder fullLR = new StringBuilder();
         ArrayList<Box> fullLRBox = new ArrayList<>();
         StringBuilder leftPart = new StringBuilder();
         ArrayList<Box> leftPartBox = new ArrayList<>();
         StringBuilder rightPart = new StringBuilder();
         ArrayList<Box> rightPartBox = new ArrayList<>();
-        // issue when bottom
         StringBuilder fullUD = new StringBuilder();
         ArrayList<Box> fullUDBox = new ArrayList<>();
-        // issue when top row
         StringBuilder upPart = new StringBuilder();
         ArrayList<Box> upPartBox = new ArrayList<>();
         StringBuilder downPart = new StringBuilder();
@@ -81,6 +76,7 @@ public class Grid {
         Box leftMost = currentBox;
 
         // adds to the full string from left to right, excluding the rightmost letter
+        StringBuilder fullLR = new StringBuilder();
         while(currentBox.getRight()!= null && currentBox.getRight().getLetter() != '_') {
             fullLRBox.add(currentBox);
             fullLR.append(currentBox.getLetter());
@@ -107,8 +103,11 @@ public class Grid {
         } else {
             leftPart.append(mostRecent.getLetter());
         }
-        boxList.add(leftPartBox);
-        stringList.add(leftPart.toString());
+        // makes sure that the word is not already in the list
+            if(!stringList.contains(leftPart.toString())) {
+                boxList.add(leftPartBox);
+                stringList.add(leftPart.toString());
+            }
 
         // just right part
         Box rightStart = mostRecent;
@@ -117,11 +116,11 @@ public class Grid {
             rightPart.append(rightStart.getLetter());
             rightStart = rightStart.getRight();
         }
-
-        boxList.add(rightPartBox);
-        stringList.add(rightPart.toString());
-
-
+        // makes sure that the word is not already in the list
+            if(!stringList.contains(leftPart.toString())) {
+                boxList.add(rightPartBox);
+                stringList.add(rightPart.toString());
+            }
         // up and down
         currentBox = mostRecent;
         // iterates to the upmost letter connected to the most recent addition
@@ -146,8 +145,9 @@ public class Grid {
             fullUDBox.add(currentBox);
             fullUD.append(currentBox.getLetter());
         }
-        boxList.add(fullUDBox);
-        stringList.add(fullUD.toString());
+
+            boxList.add(fullUDBox);
+            stringList.add(fullUD.toString());
 
         // up part
         if(mostRecent.getUp() != null) {
@@ -159,10 +159,14 @@ public class Grid {
         } else {
             upPart.append(mostRecent.getLetter());
         }
-        boxList.add(upPartBox);
-        stringList.add(upPart.toString());
 
-        // just down part
+        // makes sure that words are not being doubly added
+        if(!upPart.toString().contentEquals(fullUD)) {
+            boxList.add(upPartBox);
+            stringList.add(upPart.toString());
+        }
+
+        // just down part (for points)
         Box downStart = mostRecent;
         while(downStart!=currentBox.getDown()) {
             downPartBox.add(downStart);
@@ -170,29 +174,12 @@ public class Grid {
             downStart = downStart.getDown();
         }
 
-        boxList.add(downPartBox);
-        stringList.add(downPart.toString());
-    }
-
-
-
-
-
-
-
-    /**
-     * checks if the given word exists within the word list
-     * @param str given word
-     * @return whether the string is a word
-     */
-
-    public boolean isWord(String str) {
-        for (String arrayOfWord : arrayOfWords) {
-            if(arrayOfWord.equalsIgnoreCase(str)) {
-                return true;
-            }
+        // makes sure words are not being doubly added (for points)
+        if(!downPart.toString().contentEquals(fullUD) && !downPart.toString().contentEquals(upPart)) {
+            boxList.add(downPartBox);
+            stringList.add(downPart.toString());
         }
-        return false;
+
     }
 
 
@@ -204,7 +191,7 @@ public class Grid {
             if(arrayOfWords.contains(stringList.get(i))) {
                 wordsDeleted = true;
                 wordsRemoved++;
-                System.out.println(wordsRemoved);
+                System.out.println("word deleted: " + stringList.get(i));
                 for (int j = 0; j < boxList.get(i).size(); j++) {
                     boxList.get(i).get(j).setLetter('_');
                 }
@@ -292,7 +279,7 @@ public class Grid {
 
 
     public void placeLetter(int xCoord, int yCoord, char c) {
-        Box currentBox = grid.get(0);
+        Box currentBox = grid.getFirst();
         for (int i = 0; i < yCoord; i++) {
             currentBox = currentBox.getDown();
         }
@@ -327,7 +314,7 @@ public class Grid {
         grid.setMostRecent(grid.getIndex(2).getRight().getRight().getRight());
 
         grid.potentialWords();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < grid.stringList.size(); i++) {
             System.out.println(grid.stringList.get(i));
         }
 

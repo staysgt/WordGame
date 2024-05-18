@@ -9,9 +9,6 @@ public class Box {
     int x;
     int y;
     char letter = '_';
-
-    Box box;
-
     public Box() {
 
     }
