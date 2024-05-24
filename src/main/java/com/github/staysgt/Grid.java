@@ -23,12 +23,12 @@ public class Grid {
 
     public Grid() throws FileNotFoundException {
     }
-
+    ArrayList<String> arrayOfWords = new ArrayList<>();
 
     /**
      * turns the list of all words into an array
+     * @throws IOException uses the list of words txt file that can throw exception
      */
-    ArrayList<String> arrayOfWords = new ArrayList<>();
     public void brToArray() throws IOException {
         String line;
         int i = 0;
@@ -185,6 +185,7 @@ public class Grid {
 
     /**
      * deletes the words from the grid
+     * @return the number of boxes that were changed
      */
     public int deleteWords() {
         ArrayList<Box> resetBoxes = new ArrayList<>();
@@ -260,50 +261,11 @@ public class Grid {
         this.mostRecent = mostRecent;
     }
 
+
     /**
-     * prints out the grid
+     * creates a string that is a visual of what the grid looks like
+     * @return a string that represents the grid
      */
-
-    public void printGrid() {
-        for (int i = 0; i < grid.size(); i++) {
-            Box currentBox = grid.get(i);
-            if(i==0) {
-                for (int k = 0; k < grid.size(); k++) {
-                    if(k == 0) {
-                        System.out.print("y↓x->" + k + "__" );
-                    } else {
-                        System.out.print("__" + k + "___");
-
-                    }
-                }
-                System.out.println();
-            }
-            for (int j = 0; j < grid.size(); j++) {
-                if(j == 0) {
-                    if (currentBox.getLetter() != 0) {
-                        System.out.print(" " + i + "|__" + currentBox.getLetter() + "__|");
-                    } else {
-                        System.out.print("|_____|");
-                    }
-                }
-                // add letter
-                if(j!=0) {
-                    if (currentBox.getLetter() != 0) {
-                        System.out.print("__" + currentBox.getLetter() + "__|");
-                    } else {
-                        System.out.print("_____|");
-                    }
-                }
-
-                if(j != (grid.size() - 1)) {
-                    currentBox = currentBox.getRight();
-                }
-            }
-            System.out.println();
-        }
-    }
-
-
     public String gridToString() {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < grid.size(); i++) {
@@ -340,29 +302,28 @@ public class Grid {
                     currentBox = currentBox.getRight();
                 }
             }
-            str.append("\n");
+            if(i != grid.size() -1) str.append("\n");
         }
         return str.toString();
     }
 
     /**
-     * sets the integer value of a box in the grid
-     * @param i the integer value of the box that is being altered
-     * @param b the box that is being altered
+     * gets the box at a given index
+     * @param index given index
+     * @return the box at the given index
      */
-
-    public void set(int i, Box b) {
-        grid.set(i, b);
-    }
 
     public Box getIndex(int index) {
         return grid.get(index);
     }
 
 
-
-
-
+    /**
+     * places a given letter on the grid at a given x and y coordinate
+     * @param xCoord x coordinate value of where the letter is going to be placed
+     * @param yCoord y coordinate value of where the letter is going to be placed
+     * @param c letter that is going to be placed
+     */
     public void placeLetter(int xCoord, int yCoord, char c) {
         Box currentBox = grid.getFirst();
         for (int i = 0; i < yCoord; i++) {
@@ -383,6 +344,16 @@ public class Grid {
         mostRecent = currentBox;
     }
 
+    /**
+     * sets the value at of a box at a given index in the first row
+     * @param i the integer value of the box being altered
+     * @param b the box that is being altered
+     */
+
+    public void set(int i, Box b) {
+        grid.set(i, b);
+    }
+
     public static void main(String[] args) throws IOException {
         Grid grid = new Grid();
         grid.brToArray();
@@ -395,7 +366,7 @@ public class Grid {
         grid.getIndex(2).getRight().getRight().getRight().getDown().setLetter('o');
         grid.getIndex(2).getRight().getRight().getRight().getDown().getDown().setLetter('p');
 
-        grid.printGrid();
+        System.out.println(grid.gridToString());
         grid.setMostRecent(grid.getIndex(2).getRight().getRight().getRight());
 
         grid.potentialWords();
@@ -404,12 +375,12 @@ public class Grid {
         }
 
 
-        grid.printGrid();
-        grid.deleteWords();
+        System.out.println(grid.gridToString());
+        System.out.println(grid.deleteWords());
         System.out.println();
 
 //        System.out.println("score: " + (grid.wordsRemoved * 1000));
-        grid.printGrid();
+        System.out.println(grid.gridToString());
 
 
 

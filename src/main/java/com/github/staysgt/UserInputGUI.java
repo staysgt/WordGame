@@ -80,16 +80,16 @@ public class UserInputGUI {
         int size = scanner.nextInt();
         grid.populate(size);
         grid.brToArray();
-        grid.printGrid();
+        System.out.println(grid.gridToString());
         firstRun = false;
     }
     public void runAfterPlacement() throws IOException {
-        grid.printGrid();
+        System.out.println(grid.gridToString());
         grid.potentialWords();
         grid.deleteWords();
         System.out.println("Score: " + grid.wordsRemoved * 1000);
         if(grid.wordsDeleted) {
-            grid.printGrid();
+            System.out.println(grid.gridToString());
             grid.wordsDeleted = false;
         }
         userInput();

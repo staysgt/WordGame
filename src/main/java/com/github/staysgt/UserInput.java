@@ -73,7 +73,7 @@ public class UserInput {
 
     /**
      * is run when the round is begun
-     * @throws IOException
+     * @throws IOException uses the list of words txt file that can throw exception
      */
 
     public void begin() throws IOException {
@@ -83,22 +83,22 @@ public class UserInput {
         System.out.println("Score: 0");
         grid.populate(size);
         grid.brToArray();
-        grid.printGrid();
+        System.out.println(grid.gridToString());
         firstRun = false;
     }
 
     /**
      * is run after every time after the user indicates where they want to place
-     * @throws IOException
+     * @throws IOException uses the list of words txt file that can throw exception
      */
     public void runAfterPlacement() throws IOException {
-        grid.printGrid();
+        System.out.println(grid.gridToString());
         grid.potentialWords();
         numOfFullBoxes++;
         numOfFullBoxes -= grid.deleteWords();
         System.out.println("Score: " + grid.wordsRemoved * 1000);
         if(grid.wordsDeleted) {
-            grid.printGrid();
+            System.out.println(grid.gridToString());
             grid.wordsDeleted = false;
         }
         userInput();
@@ -106,7 +106,7 @@ public class UserInput {
 
     /**
      * runs to collect the input from the user
-     * @throws IOException
+     * @throws IOException uses the list of words txt file that can throw exception
      */
 
     public void userInput() throws IOException {
