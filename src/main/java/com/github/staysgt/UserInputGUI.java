@@ -2,15 +2,14 @@ package com.github.staysgt;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import javax.swing.*;
 
 
-public class UserInput {
+public class UserInputGUI {
 
     Grid grid = new Grid();
-    int size = 1;
+    boolean gridFull = false;
 
-    int numOfFullBoxes;
-    int totalBoxes;
     boolean firstRun = true;
     char c = 0;
     private static final Scanner scanner = new Scanner(System.in);
@@ -18,15 +17,11 @@ public class UserInput {
     HashMap<Integer, Character> probabilityLetter = new HashMap<>();
 
 
-    public UserInput() throws FileNotFoundException {
+    public UserInputGUI() throws FileNotFoundException {
     }
 
-    /**
-     * calculates the character frequency
-     */
     public void characterFreq() {
         int weight = 0;
-        // array of letters sorted based on their frequency
         Character[] characters = {'j', 'k', 'q', 'x' ,'z','b', 'c', 'f', 'h', 'm', 'p', 'v', 'w', 'y', 'g', 'd', 'l', 's', 'u', 'n', 'r', 't', 'o', 'a', 'i', 'e'};
         for (int i = 0; i < characters.length; i++) {
             if(i < 5) {
@@ -48,6 +43,14 @@ public class UserInput {
                 weight+=8;
                 probabilityLetter.put(weight, characters[i]);
             }
+//            else if (i < 23) {
+//                weight+=8;
+//                probabilityLetter.put(weight, characters[i]);
+//            } else if (i < 25) {
+//                weight+=9;
+//                probabilityLetter.put(weight, characters[i]);
+//            }
+
         }
     }
 
@@ -71,31 +74,19 @@ public class UserInput {
         return letter;
     }
 
-    /**
-     * is run when the round is begun
-     * @throws IOException
-     */
-
     public void begin() throws IOException {
-        System.out.println("enter desired grid size: ");
-        size = scanner.nextInt();
-        totalBoxes = size * size;
         System.out.println("Score: 0");
+        System.out.println("Enter desired grid size: ");
+        int size = scanner.nextInt();
         grid.populate(size);
         grid.brToArray();
         grid.printGrid();
         firstRun = false;
     }
-
-    /**
-     * is run after every time after the user indicates where they want to place
-     * @throws IOException
-     */
     public void runAfterPlacement() throws IOException {
         grid.printGrid();
         grid.potentialWords();
-        numOfFullBoxes++;
-        numOfFullBoxes -= grid.deleteWords();
+        grid.deleteWords();
         System.out.println("Score: " + grid.wordsRemoved * 1000);
         if(grid.wordsDeleted) {
             grid.printGrid();
@@ -104,28 +95,25 @@ public class UserInput {
         userInput();
     }
 
-    /**
-     * runs to collect the input from the user
-     * @throws IOException
-     */
-
     public void userInput() throws IOException {
-        while(numOfFullBoxes != totalBoxes || firstRun) {
+        while(!gridFull) {
             if (!grid.boxFull) {
                 c = letterGenerator();
             }
             if (firstRun) begin();
             System.out.println("letter: " + c);
-            System.out.println("x coordinate");
-            int x = scanner.nextInt();
-            while (x >= size) {
-                System.out.println("must be a number between 0 and " + (size - 1));
+//            System.out.println("x coordinate");
+//            int x = scanner.nextInt();
+            int x = Integer.parseInt(JOptionPane.showInputDialog(grid.gridToString() + "letter: " + c + "\n x coordinate: "));
+            int y = Integer.parseInt(JOptionPane.showInputDialog(grid.gridToString() + "letter: " + c + "\n y coordinate: "));
+            while (x >= 8) {
+                System.out.println("must be a number between 0 and 7");
                 x = scanner.nextInt();
             }
-            System.out.println("y coordinate");
-            int y = scanner.nextInt();
-            while (y >= size) {
-                System.out.println("must be a number between 0 and " + (size - 1));
+//            System.out.println("y coordinate");
+//            int y = scanner.nextInt();
+            while (y >= 8) {
+                System.out.println("must be a number between 0 and 7");
                 y = scanner.nextInt();
             }
             grid.placeLetter(x, y, c);
@@ -134,13 +122,12 @@ public class UserInput {
             }
             runAfterPlacement();
         }
-
-        System.out.println("grid is full, game over");
-        System.out.println("final score: " + grid.wordsRemoved * 1000);
+            System.out.println("grid is full, game over");
+            System.out.println("final score" + grid.wordsRemoved * 1000);
     }
 
     public static void main(String[] args) throws IOException {
-        UserInput ui = new UserInput();
+        UserInputGUI ui = new UserInputGUI();
         ui.userInput();
     }
 

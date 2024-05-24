@@ -186,18 +186,47 @@ public class Grid {
     /**
      * deletes the words from the grid
      */
-    public void deleteWords() {
+    public int deleteWords() {
+        ArrayList<Box> resetBoxes = new ArrayList<>();
         for(int i = 0; i < stringList.size(); i++) {
-            if(arrayOfWords.contains(stringList.get(i))) {
+            if(isWord(stringList.get(i), 0, arrayOfWords.size())) {
                 wordsDeleted = true;
                 wordsRemoved++;
                 System.out.println("word deleted: " + stringList.get(i));
                 for (int j = 0; j < boxList.get(i).size(); j++) {
                     boxList.get(i).get(j).setLetter('_');
+                    if(!resetBoxes.contains(boxList.get(i).get(j))) {
+                        resetBoxes.add(boxList.get(i).get(j));
+                    }
                 }
             }
         }
+        return resetBoxes.size();
+
     }
+
+    /**
+     * utilizes binary search in order to effectively traverse the list of words to find if the given word is a word
+     * @param givenWord the word being compared to the list of words
+     * @param first the lower bound
+     * @param last the upper bound
+     * @return if the given word is a word
+     */
+    public boolean isWord(String givenWord, int first, int last) {
+        int middle = (first + last)/2;
+        String midWord = arrayOfWords.get(middle);
+        if(first > last) return false;
+
+        if(givenWord.equals(midWord)) return true;
+
+
+        if(givenWord.compareTo(midWord) < 0) {
+            return isWord(givenWord, first,middle -1);
+        } else {
+            return isWord(givenWord, middle + 1,last);
+        }
+    }
+
 
 
     /**
@@ -223,9 +252,17 @@ public class Grid {
         }
     }
 
+    /**
+     * sets the value of the most recent box
+     * @param mostRecent the box that was most recently edited
+     */
     public void setMostRecent(Box mostRecent) {
         this.mostRecent = mostRecent;
     }
+
+    /**
+     * prints out the grid
+     */
 
     public void printGrid() {
         for (int i = 0; i < grid.size(); i++) {
@@ -265,6 +302,54 @@ public class Grid {
             System.out.println();
         }
     }
+
+
+    public String gridToString() {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < grid.size(); i++) {
+            Box currentBox = grid.get(i);
+            if(i==0) {
+                for (int k = 0; k < grid.size(); k++) {
+                    if(k == 0) {
+                        str.append("y↓x->").append(k).append("__");
+                    } else {
+                        str.append("__").append(k).append("___");
+
+                    }
+                }
+                str.append("\n");
+            }
+            for (int j = 0; j < grid.size(); j++) {
+                if(j == 0) {
+                    if (currentBox.getLetter() != 0) {
+                        str.append(" ").append(i).append("|__").append(currentBox.getLetter()).append("__|");
+                    } else {
+                        str.append("|_____|");
+                    }
+                }
+                // add letter
+                if(j!=0) {
+                    if (currentBox.getLetter() != 0) {
+                        str.append("__").append(currentBox.getLetter()).append("__|");
+                    } else {
+                        str.append("_____|");
+                    }
+                }
+
+                if(j != (grid.size() - 1)) {
+                    currentBox = currentBox.getRight();
+                }
+            }
+            str.append("\n");
+        }
+        return str.toString();
+    }
+
+    /**
+     * sets the integer value of a box in the grid
+     * @param i the integer value of the box that is being altered
+     * @param b the box that is being altered
+     */
 
     public void set(int i, Box b) {
         grid.set(i, b);
@@ -318,12 +403,14 @@ public class Grid {
             System.out.println(grid.stringList.get(i));
         }
 
+
         grid.printGrid();
         grid.deleteWords();
         System.out.println();
 
 //        System.out.println("score: " + (grid.wordsRemoved * 1000));
         grid.printGrid();
+
 
 
     }
