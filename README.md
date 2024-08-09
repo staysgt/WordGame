@@ -1,6 +1,6 @@
 # com.github.staysgt:WordB
 
-Write your project description here...
+A word game I made to strengthen my Java skills.
 
 Java version 21
 
